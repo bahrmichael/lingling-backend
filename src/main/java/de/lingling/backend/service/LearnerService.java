@@ -30,8 +30,7 @@ public class LearnerService {
         final Learner learner = new Learner();
         learner.setAccount(account);
         learner.setLanguageDst(language);
-        repository.save(learner);
-        return learner;
+        return repository.save(learner);
     }
 
     public Learner findLatestLearnerForAccount(final Account account) {
