@@ -10,6 +10,7 @@ import de.lingling.backend.domain.Language;
 import de.lingling.backend.domain.Learner;
 import de.lingling.backend.domain.Sentence;
 import de.lingling.backend.repository.AuditRepository;
+import de.lingling.backend.repository.LanguageRepository;
 import de.lingling.backend.repository.SentenceRepository;
 
 @Component
@@ -17,11 +18,14 @@ import de.lingling.backend.repository.SentenceRepository;
 public class SentenceService {
     private final SentenceRepository repository;
     private final AuditRepository auditRepository;
+    private final LanguageRepository languageRepository;
 
     public SentenceService(final SentenceRepository repository,
-                           final AuditRepository auditRepository) {
+            final AuditRepository auditRepository,
+            final LanguageRepository languageRepository) {
         this.repository = repository;
         this.auditRepository = auditRepository;
+        this.languageRepository = languageRepository;
     }
 
     public Sentence getRandomSentence(final Language src, final Language dst, final Learner learner) {
@@ -41,6 +45,7 @@ public class SentenceService {
         final Sentence theSentence = new Sentence();
         final Language lang = new Language();
         lang.setLanguageCode("en-US");
+        languageRepository.save(lang);
         theSentence.setLanguageDst(lang);
         theSentence.setLanguageSrc(lang);
         theSentence.setTextDst(sentence);
