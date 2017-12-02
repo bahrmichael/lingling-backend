@@ -19,7 +19,7 @@ before_deploy:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: rsync --quiet $TRAVIS_BUILD_DIR/target/backend*.war ubuntu@ec2-34-249-81-249.eu-west-1.compute.amazonaws.com:~ && ssh-agent -k
+  script: rsync --quiet $TRAVIS_BUILD_DIR/target/backend*.jar ubuntu@ec2-34-249-81-249.eu-west-1.compute.amazonaws.com:~ && ssh-agent -k
 #  on:
 #    tags: true
 
