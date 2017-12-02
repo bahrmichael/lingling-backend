@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,12 @@ public class SentenceController {
         final String returnedSentence = sentenceService.getRandomSentence(src, dst, learner).getTextDst();
         auditService.addAudit(alexaId, utterance, Action.SENTENCE, returnedSentence);
         return returnedSentence;
+    }
+
+    @PostMapping("/dev/add/{sentence}")
+    @Transactional
+    public void addSentence(@PathVariable("sentence") final String sentence) {
+        sentenceService.devAddSentence(sentence);
     }
 
     @GetMapping("/repeat")

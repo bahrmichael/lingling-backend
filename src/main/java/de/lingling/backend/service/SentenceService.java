@@ -44,4 +44,15 @@ public class SentenceService {
                               .map(audit -> repository.findByTextDst(audit.getReturnedValue()))
                               .orElse(null);
     }
+
+    public void devAddSentence(final String sentence) {
+        final Sentence theSentence = new Sentence();
+        final Language lang = new Language();
+        lang.setLanguageCode("en-US");
+        theSentence.setLanguageDst(lang);
+        theSentence.setLanguageSrc(lang);
+        theSentence.setTextDst(sentence);
+        theSentence.setTextSrc(sentence);
+        repository.save(theSentence);
+    }
 }
