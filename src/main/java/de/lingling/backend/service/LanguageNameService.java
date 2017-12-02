@@ -24,9 +24,9 @@ public class LanguageNameService {
     }
 
     /* language must be in the en-US format */
-    public List<LanguageName> findPossibleDstLanguages(final String language) {
-        String srcCode = language.split("-")[0];
-        Language srcLanguage = languageRepository.findByLanguageCode(srcCode);
+    public List<LanguageName> findPossibleDstLanguages(final String languageCode) {
+        // todo: consider wildcard like en-*
+        final Language srcLanguage = languageRepository.findByLanguageCode(languageCode);
         return repository.findAllByLanguageSrc(srcLanguage);
     }
 
