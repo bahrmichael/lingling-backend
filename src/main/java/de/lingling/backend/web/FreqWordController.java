@@ -58,11 +58,11 @@ public class FreqWordController {
     @Transactional
     public void postFrequencyWOrdOk(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final String latestSentence = auditService.findLatestValue(alexaId);
+        final String latestSentence = auditService.findLatestSentence(alexaId);
         final Account account = accountService.findAccount(alexaId);
         final Learner learner = learnerService.findLatestLearnerForAccount(account);
 
-        final String recentText = auditService.findLatestFrequencyWordForUser(alexaId);
+        final String recentText = auditService.findLatestFrequencyWord(alexaId);
         final Word newWord = wordService.findWord(recentText, learner.getLanguageDst());
         knownWordService.addNewWords(Collections.singletonList(newWord), learner);
         auditService.addAudit(alexaId, utterance, Action.FREQUENCY_WORD_OK, latestSentence);
@@ -72,7 +72,7 @@ public class FreqWordController {
     @Transactional
     public void postFrequencyWordNotOk(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final String lastFrequencyWord = auditService.findLatestFrequencyWordForUser(alexaId);
+        final String lastFrequencyWord = auditService.findLatestFrequencyWord(alexaId);
         auditService.addAudit(alexaId, utterance, Action.FREQUENCY_WORD_NOTOK, lastFrequencyWord);
     }
 }

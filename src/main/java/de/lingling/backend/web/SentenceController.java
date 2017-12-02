@@ -94,7 +94,7 @@ public class SentenceController {
     @Transactional
     public void postOk(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final String latestSentence = auditService.findLatestValue(alexaId);
+        final String latestSentence = auditService.findLatestSentence(alexaId);
         final Account account = accountService.findAccount(alexaId);
         final Learner learner = learnerService.findLatestLearnerForAccount(account);
         final List<String> unknownWords = knownWordService.extractUnknownWordsFromSentence(learner, latestSentence);
@@ -107,7 +107,7 @@ public class SentenceController {
     @Transactional
     public void postNotOk(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final String latestSentence = auditService.findLatestValue(alexaId);
+        final String latestSentence = auditService.findLatestSentence(alexaId);
         auditService.addAudit(alexaId, utterance, Action.NOTOK, latestSentence);
     }
 }

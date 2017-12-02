@@ -36,7 +36,7 @@ public class AuditService {
         return repository.findFirstByAlexaIdOrderByTimestampDesc(alexaId);
     }
 
-    public String findLatestValue(final String alexaId) {
+    public String findLatestSentence(final String alexaId) {
         return repository.findFirstByAlexaIdAndActionOrderByTimestampDesc(alexaId, Action.SENTENCE)
                          .map(Audit::getReturnedValue)
                          .orElseThrow(this::exception);
@@ -46,7 +46,7 @@ public class AuditService {
         return new IllegalStateException("No sentence could be found for the user.");
     }
 
-    public String findLatestFrequencyWordForUser(final String alexaId) {
+    public String findLatestFrequencyWord(final String alexaId) {
         return repository.findFirstByAlexaIdAndActionOrderByTimestampDesc(alexaId, Action.FREQUENCY_WORD)
                          .map(Audit::getReturnedValue).orElse(null);
     }
