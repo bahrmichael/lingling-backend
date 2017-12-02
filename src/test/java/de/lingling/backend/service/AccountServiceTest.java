@@ -1,11 +1,3 @@
-/*
- * AccountServiceTest.java
- *
- * Created on 2017-12-02
- *
- * Copyright (C) 2017 Volkswagen AG, All rights reserved.
- */
-
 package de.lingling.backend.service;
 
 import org.junit.Test;

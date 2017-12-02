@@ -1,11 +1,3 @@
-/*
- * SentenceService.java
- *
- * Created on 2017-11-11
- *
-
- */
-
 package de.lingling.backend.service;
 
 import javax.transaction.Transactional;
