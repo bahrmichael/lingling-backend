@@ -1,0 +1,13 @@
+package de.lingling.backend.domain;
+
+public enum Action {
+    SENTENCE, REPEAT, TRANSLATE, OK, NOTOK,
+    FREQUENCY_WORD,
+    FREQUENCY_WORD_NOTOK,
+    FREQUENCY_WORD_OK,
+    GET_LANGUAGES,
+    LATEST_INTERACTION,
+    SET_LANGUAGE,
+    GET_ONBOARDING_COMPLETED,
+    LEARNER
+}
