@@ -9,6 +9,7 @@
 package de.lingling.backend.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -25,7 +26,8 @@ import de.lingling.backend.repository.KnownWordRepository;
 @Component
 @Transactional
 public class KnownWordService {
-    private static final Pattern SPLIT_PATTERN = Pattern.compile("[ ,\\.:]");
+
+    private static final Pattern SPLIT_PATTERN = Pattern.compile("[ ,\\.:!]");
     private final KnownWordRepository repository;
 
     public KnownWordService(final KnownWordRepository repository) {
@@ -53,7 +55,7 @@ public class KnownWordService {
         return unknownWords;
     }
 
-    public void addNewWords(final List<Word> newWords, final Learner learner) {
+    public void addNewWords(final Collection<Word> newWords, final Learner learner) {
         repository.save(newWords.stream().map(word -> new KnownWord(word, learner)).collect(Collectors.toList()));
     }
 

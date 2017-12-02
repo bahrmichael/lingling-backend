@@ -30,6 +30,13 @@ public class Word implements Serializable {
     @Column(nullable = false, name = Columns.WORD_FREQUENCY)
     private Long frequency;
 
+    public Word() {
+    }
+
+    public Word(final String text) {
+        this.text = text;
+    }
+
     public Long getId() {
         return id;
     }

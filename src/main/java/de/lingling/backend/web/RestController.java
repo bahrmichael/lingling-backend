@@ -59,6 +59,11 @@ public class RestController {
         this.languageService = languageService;
     }
 
+    @GetMapping("/alive")
+    public ResponseEntity isAlive() {
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping(value = "/init")
     public ResponseEntity signUp(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
                                  @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance,
