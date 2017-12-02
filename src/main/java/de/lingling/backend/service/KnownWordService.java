@@ -34,25 +34,30 @@ public class KnownWordService {
         this.repository = repository;
     }
 
-    public List<String> extractUnknownWordsFromSentence(final Learner learner, final String latestSentence) {
+    public List<String> extractUnknownWordsFromSentence(final Learner learner, final CharSequence latestSentence) {
         final List<String> knownWords = repository.findAllByLearner(learner).stream()
                                                   .map(w -> w.getWord().getText())
                                                   .collect(Collectors.toList());
         final String[] split = SPLIT_PATTERN.split(latestSentence);
         final List<String> unknownWords = new ArrayList<>();
+
         for (final String sentenceWord : split) {
-            for (final String knownWord : knownWords) {
-                if (sentenceWord.contains(knownWord)) {
-                    if (sentenceWord.toLowerCase().contains(knownWord.toLowerCase())) {
-                        unknownWords.add(sentenceWord);
-                    }
-                    // continue with the next word of the sentence
-                    break;
-                }
+            if (!isWordKnown(sentenceWord, knownWords)) {
+                unknownWords.add(sentenceWord.toLowerCase());
             }
         }
 
+
         return unknownWords;
+    }
+
+    private boolean isWordKnown(final String needle, final Iterable<String> haystack) {
+        for (final String el : haystack) {
+            if (needle.toLowerCase().contains(el.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addNewWords(final Collection<Word> newWords, final Learner learner) {
