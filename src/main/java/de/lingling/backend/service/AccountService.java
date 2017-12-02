@@ -32,7 +32,7 @@ public class AccountService {
     public Account createAccount(final String alexaId, final String languageIsoCode) {
         final Account account = new Account();
         account.setAlexaId(alexaId);
-        account.setLanguageSrc(languageRepository.findByIsoCode(languageIsoCode));
+        account.setLanguageSrc(languageRepository.findByLanguageCode(languageIsoCode));
         repository.save(account);
         return account;
     }

@@ -18,24 +18,24 @@ public class Language implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    private String isoCode;
+    private String languageCode;
 
     public Language() {
     }
 
-    public Language(final String isoCode) {
-        this.isoCode = isoCode;
+    public Language(final String languageCode) {
+        this.languageCode = languageCode;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getIsoCode() {
-        return isoCode;
+    public String getLanguageCode() {
+        return languageCode;
     }
 
-    public void setIsoCode(final String isoCode) {
-        this.isoCode = isoCode;
+    public void setLanguageCode(final String languageCode) {
+        this.languageCode = languageCode;
     }
 }

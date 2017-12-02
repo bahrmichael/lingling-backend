@@ -26,7 +26,7 @@ public class LanguageNameService {
     /* language must be in the en-US format */
     public List<LanguageName> findPossibleDstLanguages(final String language) {
         String srcCode = language.split("-")[0];
-        Language srcLanguage = languageRepository.findByIsoCode(srcCode);
+        Language srcLanguage = languageRepository.findByLanguageCode(srcCode);
         return repository.findAllByLanguageSrc(srcLanguage);
     }
 
@@ -35,8 +35,8 @@ public class LanguageNameService {
     }
 
     public void add(final LanguageName language) {
-        final Language src = languageRepository.findByIsoCode(language.getLanguageSrc().getIsoCode());
-        final Language dst = languageRepository.findByIsoCode(language.getLanguageDst().getIsoCode());
+        final Language src = languageRepository.findByLanguageCode(language.getLanguageSrc().getLanguageCode());
+        final Language dst = languageRepository.findByLanguageCode(language.getLanguageDst().getLanguageCode());
         language.setLanguageSrc(src);
         language.setLanguageDst(dst);
         repository.save(language);
