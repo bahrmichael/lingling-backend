@@ -59,12 +59,17 @@ public class RestController {
         this.languageService = languageService;
     }
 
-    @PostMapping(value = "/signup")
+    @PostMapping(value = "/init")
     public ResponseEntity signUp(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
                                  @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance,
                                  @RequestHeader(name = Headers.ALEXA_LANGUAGE, required = true) final String language) {
-        accountService.createAccount(alexaId, language.split("-")[0]);
-        return ResponseEntity.ok().build();
+        final Account account = accountService.findAccount(alexaId);
+        if (null != account) {
+            accountService.createAccount(alexaId, language);
+            return ResponseEntity.status(201).build();
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     @GetMapping(value = "/latest-interaction", produces = "text/plain")
