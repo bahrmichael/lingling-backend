@@ -73,4 +73,10 @@ public class AuditServiceTest {
         assertEquals(RET_VAL, latestSentence);
         verify(repo).findFirstByAlexaIdAndActionOrderByTimestampDesc(ALEXA_ID, Action.FREQUENCY_WORD);
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void findLatestSentence_withoutResult() {
+        when(repo.findFirstByAlexaIdAndActionOrderByTimestampDesc(ALEXA_ID, Action.SENTENCE)).thenReturn(Optional.empty());
+        sut.findLatestSentence(ALEXA_ID);
+    }
 }

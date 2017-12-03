@@ -1,12 +1,6 @@
-/*
- * UtteranceService.java
- *
- * Created on 2017-11-11
- *
-
- */
-
 package de.lingling.backend.service;
+
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -37,12 +31,11 @@ public class AuditService {
     }
 
     public String findLatestSentence(final String alexaId) {
-        return repository.findFirstByAlexaIdAndActionOrderByTimestampDesc(alexaId, Action.SENTENCE)
-                         .map(Audit::getReturnedValue)
-                         .orElseThrow(this::exception);
+        final Optional<Audit> optional = repository.findFirstByAlexaIdAndActionOrderByTimestampDesc(alexaId, Action.SENTENCE);
+        return optional.orElseThrow(this::noSentence).getReturnedValue();
     }
 
-    private IllegalStateException exception() {
+    private IllegalStateException noSentence() {
         return new IllegalStateException("No sentence could be found for the user.");
     }
 
