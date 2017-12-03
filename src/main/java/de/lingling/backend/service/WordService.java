@@ -8,8 +8,10 @@
 
 package de.lingling.backend.service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -39,8 +41,9 @@ public class WordService {
         return findWords(Collections.singletonList(unknownWord), language).get(0);
     }
 
-    public List<Word> findWords(final List<String> unknownWords, final Language language) {
-        return unknownWords.stream().map(s -> repository.findWord(s, language)).collect(Collectors.toList());
+    public List<Word> findWords(final Collection<String> unknownWords, final Language language) {
+        return unknownWords.stream().map(s -> repository.findWord(s, language))
+                .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public Word getNextFrequencyWord(final Learner learner) {

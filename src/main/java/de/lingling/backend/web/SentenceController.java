@@ -65,7 +65,7 @@ public class SentenceController {
     @PostMapping("/dev/add/{sentence}")
     @Transactional
     public void addSentence(@PathVariable("sentence") final String sentence) {
-        sentenceService.devAddSentence(sentence);
+//        sentenceService.devAddSentence(sentence);
     }
 
     @GetMapping("/repeat")
