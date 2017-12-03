@@ -17,7 +17,8 @@ import de.lingling.backend.repository.LearnerRepository;
 public class LearnerServiceTest {
 
     private final LearnerRepository repo = mock(LearnerRepository.class);
-    private final LearnerService sut = new LearnerService(repo);
+    private final AccountService accountService = mock(AccountService.class);
+    private final LearnerService sut = new LearnerService(repo, accountService);
 
     @Test
     public void addLearner() {

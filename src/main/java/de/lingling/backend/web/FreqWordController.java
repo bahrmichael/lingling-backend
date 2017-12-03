@@ -11,14 +11,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import de.lingling.backend.domain.Account;
 import de.lingling.backend.domain.Action;
-import de.lingling.backend.domain.Learner;
 import de.lingling.backend.domain.Word;
-import de.lingling.backend.service.AccountService;
 import de.lingling.backend.service.AuditService;
 import de.lingling.backend.service.KnownWordService;
-import de.lingling.backend.service.LearnerService;
 import de.lingling.backend.service.WordService;
 
 @Controller
@@ -26,17 +22,12 @@ import de.lingling.backend.service.WordService;
 @RequestMapping("/frequency-word")
 public class FreqWordController {
 
-    private final AccountService accountService;
-    private final LearnerService learnerService;
     private final WordService wordService;
     private final AuditService auditService;
     private final KnownWordService knownWordService;
 
-    public FreqWordController(final AccountService accountService,
-            final LearnerService learnerService, final WordService wordService,
-            final AuditService auditService, final KnownWordService knownWordService) {
-        this.accountService = accountService;
-        this.learnerService = learnerService;
+    public FreqWordController(final WordService wordService, final AuditService auditService,
+            final KnownWordService knownWordService) {
         this.wordService = wordService;
         this.auditService = auditService;
         this.knownWordService = knownWordService;
@@ -47,9 +38,7 @@ public class FreqWordController {
     @Transactional
     public String getFrequencyWord(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final Account account = accountService.findAccount(alexaId);
-        final Learner learner = learnerService.findLatestLearnerForAccount(account);
-        final String returnedWord = wordService.getNextFrequencyWord(learner).getText();
+        final String returnedWord = wordService.getNextFrequencyWord(alexaId).getText();
         auditService.addAudit(alexaId, utterance, Action.FREQUENCY_WORD, returnedWord);
         return returnedWord;
     }
@@ -58,21 +47,15 @@ public class FreqWordController {
     @Transactional
     public void postFrequencyWOrdOk(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final String latestSentence = auditService.findLatestSentence(alexaId);
-        final Account account = accountService.findAccount(alexaId);
-        final Learner learner = learnerService.findLatestLearnerForAccount(account);
-
-        final String recentText = auditService.findLatestFrequencyWord(alexaId);
-        final Word newWord = wordService.findWord(recentText, learner.getLanguageDst());
-        knownWordService.addNewWords(Collections.singletonList(newWord), learner);
-        auditService.addAudit(alexaId, utterance, Action.FREQUENCY_WORD_OK, latestSentence);
+        final Word newWord = wordService.findWord(auditService.findLatestFrequencyWord(alexaId), alexaId);
+        knownWordService.addNewWords(Collections.singletonList(newWord), alexaId);
+        auditService.addAudit(alexaId, utterance, Action.FREQUENCY_WORD_OK, auditService.findLatestSentence(alexaId));
     }
 
     @PostMapping("/notok")
     @Transactional
     public void postFrequencyWordNotOk(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final String lastFrequencyWord = auditService.findLatestFrequencyWord(alexaId);
-        auditService.addAudit(alexaId, utterance, Action.FREQUENCY_WORD_NOTOK, lastFrequencyWord);
+        auditService.addAudit(alexaId, utterance, Action.FREQUENCY_WORD_NOTOK, auditService.findLatestFrequencyWord(alexaId));
     }
 }

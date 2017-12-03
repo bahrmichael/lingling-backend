@@ -21,14 +21,12 @@ import de.lingling.backend.domain.Action;
 import de.lingling.backend.domain.Audit;
 import de.lingling.backend.domain.Language;
 import de.lingling.backend.domain.LanguageName;
-import de.lingling.backend.domain.Learner;
 import de.lingling.backend.service.AccountService;
 import de.lingling.backend.service.AuditService;
 import de.lingling.backend.service.KnownWordService;
 import de.lingling.backend.service.LanguageNameService;
 import de.lingling.backend.service.LanguageService;
 import de.lingling.backend.service.LearnerService;
-import de.lingling.backend.service.WordService;
 
 @Controller
 @EnableTransactionManagement
@@ -39,7 +37,6 @@ public class RestController {
     private final KnownWordService knownWordService;
     private final AccountService accountService;
     private final LearnerService learnerService;
-    private final WordService wordService;
     private final LanguageNameService languageNameService;
     private final LanguageService languageService;
 
@@ -47,14 +44,12 @@ public class RestController {
                           final KnownWordService knownWordService,
                           final AccountService accountService,
                           final LearnerService learnerService,
-                          final WordService wordService,
                           final LanguageNameService languageNameService,
                           final LanguageService languageService) {
         this.auditService = auditService;
         this.knownWordService = knownWordService;
         this.accountService = accountService;
         this.learnerService = learnerService;
-        this.wordService = wordService;
         this.languageNameService = languageNameService;
         this.languageService = languageService;
     }
@@ -139,14 +134,15 @@ public class RestController {
     public ResponseEntity isOnboardingCompleted(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
                                                 @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
 
-        final Account account = accountService.findAccount(alexaId);
-        final Learner learner = learnerService.findLatestLearnerForAccount(account);
         auditService.addAudit(alexaId, utterance, Action.GET_ONBOARDING_COMPLETED,null);
-        if (MIN_REQUIRED_WORDS_FOR_ONBOARDING <= knownWordService.countKnownWords(learner)) {
+        if (isOnboardingDone(alexaId)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.noContent().build();
         }
     }
 
+    private boolean isOnboardingDone(final String alexaId) {
+        return MIN_REQUIRED_WORDS_FOR_ONBOARDING <= knownWordService.countKnownWords(learnerService.findLatestLearner(alexaId));
+    }
 }

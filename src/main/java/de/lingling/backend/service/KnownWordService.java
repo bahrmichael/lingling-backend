@@ -29,9 +29,12 @@ public class KnownWordService {
 
     private static final Pattern SPLIT_PATTERN = Pattern.compile("[ ,\\.:!]");
     private final KnownWordRepository repository;
+    private final LearnerService learnerService;
 
-    public KnownWordService(final KnownWordRepository repository) {
+    public KnownWordService(final KnownWordRepository repository,
+            final LearnerService learnerService) {
         this.repository = repository;
+        this.learnerService = learnerService;
     }
 
     public List<String> extractUnknownWordsFromSentence(final Learner learner, final CharSequence latestSentence) {
@@ -62,6 +65,10 @@ public class KnownWordService {
 
     public void addNewWords(final Collection<Word> newWords, final Learner learner) {
         repository.save(newWords.stream().map(word -> new KnownWord(word, learner)).collect(Collectors.toList()));
+    }
+
+    public void addNewWords(final Collection<Word> newWords, final String alexaId) {
+        addNewWords(newWords, learnerService.findLatestLearner(alexaId));
     }
 
     public int countKnownWords(final Learner learner) {

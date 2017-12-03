@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,19 +61,12 @@ public class SentenceController {
         return returnedSentence;
     }
 
-    @PostMapping("/dev/add/{sentence}")
-    @Transactional
-    public void addSentence(@PathVariable("sentence") final String sentence) {
-//        sentenceService.devAddSentence(sentence);
-    }
-
     @GetMapping("/repeat")
     @ResponseBody
     @Transactional
     public String repeatSentence(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final Account account = accountService.findAccount(alexaId);
-        final String returnedSentence = sentenceService.getRecentSentence(account).getTextDst();
+        final String returnedSentence = sentenceService.getRecentSentence(alexaId).getTextDst();
         auditService.addAudit(alexaId, utterance, Action.REPEAT, returnedSentence);
         return returnedSentence;
     }
@@ -84,8 +76,7 @@ public class SentenceController {
     @Transactional
     public String getTranslation(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final Account account = accountService.findAccount(alexaId);
-        final String returnedSentence = sentenceService.getRecentSentence(account).getTextSrc();
+        final String returnedSentence = sentenceService.getRecentSentence(alexaId).getTextSrc();
         auditService.addAudit(alexaId, utterance, Action.TRANSLATE, returnedSentence);
         return returnedSentence;
     }
@@ -95,8 +86,7 @@ public class SentenceController {
     public void postOk(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
         final String latestSentence = auditService.findLatestSentence(alexaId);
-        final Account account = accountService.findAccount(alexaId);
-        final Learner learner = learnerService.findLatestLearnerForAccount(account);
+        final Learner learner = learnerService.findLatestLearner(alexaId);
         final List<String> unknownWords = knownWordService.extractUnknownWordsFromSentence(learner, latestSentence);
         final List<Word> newWords = wordService.findWords(unknownWords, learner.getLanguageDst());
         knownWordService.addNewWords(newWords, learner);
@@ -107,7 +97,6 @@ public class SentenceController {
     @Transactional
     public void postNotOk(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final String latestSentence = auditService.findLatestSentence(alexaId);
-        auditService.addAudit(alexaId, utterance, Action.NOTOK, latestSentence);
+        auditService.addAudit(alexaId, utterance, Action.NOTOK, auditService.findLatestSentence(alexaId));
     }
 }

@@ -21,7 +21,8 @@ import de.lingling.backend.repository.KnownWordRepository;
 public class KnownWordServiceTest {
 
     private final KnownWordRepository repo = mock(KnownWordRepository.class);
-    private final KnownWordService sut = new KnownWordService(repo);
+    private final LearnerService learnerService = mock(LearnerService.class);
+    private final KnownWordService sut = new KnownWordService(repo, learnerService);
 
     @Test
     public void extractUnknownWordsFromSentence_oneNewWord() {

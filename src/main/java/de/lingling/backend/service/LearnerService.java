@@ -21,9 +21,12 @@ import de.lingling.backend.repository.LearnerRepository;
 @Transactional
 public class LearnerService {
     private final LearnerRepository repository;
+    private final AccountService accountService;
 
-    public LearnerService(final LearnerRepository repository) {
+    public LearnerService(final LearnerRepository repository,
+            final AccountService accountService) {
         this.repository = repository;
+        this.accountService = accountService;
     }
 
     public Learner addLearner(final Account account, final Language language) {
@@ -35,5 +38,10 @@ public class LearnerService {
 
     public Learner findLatestLearnerForAccount(final Account account) {
         return repository.findByAccount(account);
+    }
+
+    public Learner findLatestLearner(final String alexaId) {
+        final Account account = accountService.findAccount(alexaId);
+        return findLatestLearnerForAccount(account);
     }
 }

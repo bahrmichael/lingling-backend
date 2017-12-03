@@ -31,7 +31,8 @@ public class WordServiceTest {
 
     private final WordRepository wordRepo = mock(WordRepository.class);
     private final KnownWordRepository knownWordRepo = mock(KnownWordRepository.class);
-    private final WordService sut = new WordService(wordRepo, knownWordRepo);
+    private final LearnerService learnerService = mock(LearnerService.class);
+    private final WordService sut = new WordService(wordRepo, knownWordRepo, learnerService);
 
     @Test
     public void findWord() {

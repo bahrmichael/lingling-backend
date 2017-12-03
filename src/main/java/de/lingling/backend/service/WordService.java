@@ -30,15 +30,23 @@ import de.lingling.backend.repository.WordRepository;
 public class WordService {
     private final WordRepository repository;
     private final KnownWordRepository knownWordRepository;
+    private final LearnerService learnerService;
 
     public WordService(final WordRepository repository,
-                       final KnownWordRepository knownWordRepository) {
+            final KnownWordRepository knownWordRepository,
+            final LearnerService learnerService) {
         this.repository = repository;
         this.knownWordRepository = knownWordRepository;
+        this.learnerService = learnerService;
     }
 
     public Word findWord(final String unknownWord, final Language language) {
         return findWords(Collections.singletonList(unknownWord), language).get(0);
+    }
+
+    public Word findWord(final String unknownWord, final String alexaId) {
+        final Learner learner = learnerService.findLatestLearner(alexaId);
+        return findWords(Collections.singletonList(unknownWord), learner.getLanguageDst()).get(0);
     }
 
     public List<Word> findWords(final Collection<String> unknownWords, final Language language) {
@@ -51,5 +59,10 @@ public class WordService {
                                                            .map(KnownWord::getWord).map(Word::getId)
                                                            .collect(Collectors.toList());
         return repository.findTop10ByIdNotInOrderByFrequencyDesc(knownWordIds).findAny().orElse(null);
+    }
+
+    public Word getNextFrequencyWord(final String alexaId) {
+        final Learner learner = learnerService.findLatestLearner(alexaId);
+        return getNextFrequencyWord(learner);
     }
 }
