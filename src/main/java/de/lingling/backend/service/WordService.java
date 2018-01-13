@@ -65,4 +65,8 @@ public class WordService {
         final Learner learner = learnerService.findLatestLearner(alexaId);
         return getNextFrequencyWord(learner);
     }
+
+    public void addFrequencyWord(final Word word) {
+        repository.save(word);
+    }
 }

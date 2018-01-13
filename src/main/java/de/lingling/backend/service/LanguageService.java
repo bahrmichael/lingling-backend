@@ -19,4 +19,8 @@ public class LanguageService {
     public void add(final Language language) {
         repository.save(language);
     }
+
+    public Language find(final String languageCode) {
+        return repository.findByLanguageCode(languageCode);
+    }
 }

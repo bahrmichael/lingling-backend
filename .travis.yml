@@ -11,7 +11,7 @@ cache:
   directories:
   - $HOME/.m2
 addons:
-  ssh_known_hosts: ec2-34-249-81-249.eu-west-1.compute.amazonaws.com
+  ssh_known_hosts: 52.213.36.32
 before_deploy:
 - eval "$(ssh-agent -s)"
 - chmod 600 /tmp/deploy_key
@@ -19,7 +19,7 @@ before_deploy:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: rsync --quiet $TRAVIS_BUILD_DIR/target/backend*.jar ubuntu@ec2-34-249-81-249.eu-west-1.compute.amazonaws.com:~ && ssh-agent -k
+  script: rsync --quiet $TRAVIS_BUILD_DIR/target/backend*.jar ubuntu@52.213.36.32:~ && ssh-agent -k
 #  on:
 #    tags: true
 
