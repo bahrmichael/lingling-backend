@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -31,6 +33,8 @@ import de.lingling.backend.service.LearnerService;
 @Controller
 @EnableTransactionManagement
 public class RestController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RestController.class);
 
     public static final int MIN_REQUIRED_WORDS_FOR_ONBOARDING = 20;
     private final AuditService auditService;
@@ -122,8 +126,11 @@ public class RestController {
     public void setDstLanguage(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
                                @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance,
                                @PathVariable final String languageName) {
+        LOG.info("Invoked learner/{} with headers {} and {}", languageName, utterance, alexaId);
         final Language language = languageNameService.findLanguage(languageName);
+        // todo: perform init if the account does not exist yet
         final Account account = accountService.findAccount(alexaId);
+        LOG.info("Loaded account: {}", account);
         learnerService.addLearner(account, language);
         auditService.addAudit(alexaId, utterance, Action.SET_LANGUAGE,null);
     }

@@ -20,8 +20,8 @@ import de.lingling.backend.web.Headers;
 @Ignore
 public class BackendApplicationIntegrationTests {
 
-    public static final String BASE_URL = "http://localhost:8080";
-//    public static final String BASE_URL = "http://52.213.36.32:8080";
+//    public static final String BASE_URL = "http://localhost:8080";
+    public static final String BASE_URL = "http://52.213.36.32:8080";
 
     @Test
     public void prep() throws Exception {

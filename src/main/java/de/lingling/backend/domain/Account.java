@@ -59,4 +59,14 @@ public class Account implements Serializable {
     public void setLearners(final Set<Learner> learners) {
         this.learners = learners;
     }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+               "id=" + id +
+               ", alexaId='" + alexaId + '\'' +
+               ", languageSrc=" + languageSrc +
+               ", learners=" + learners +
+               '}';
+    }
 }
