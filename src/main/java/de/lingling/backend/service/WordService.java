@@ -58,7 +58,9 @@ public class WordService {
         final List<Long> knownWordIds = knownWordRepository.findAllByLearner(learner).stream()
                                                            .map(KnownWord::getWord).map(Word::getId)
                                                            .collect(Collectors.toList());
-        return repository.findTop10ByIdNotInOrderByFrequencyDesc(knownWordIds).findAny().orElse(null);
+        return repository.findAllByOrderByFrequencyDesc()
+                .filter(word -> !knownWordIds.contains(word.getId()))
+                .findFirst().orElse(null);
     }
 
     public Word getNextFrequencyWord(final String alexaId) {

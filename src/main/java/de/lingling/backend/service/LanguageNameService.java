@@ -26,7 +26,7 @@ public class LanguageNameService {
     /* language must be in the en-US format */
     public List<LanguageName> findPossibleDstLanguages(final String languageCode) {
         // todo: consider wildcard like en-*
-        final Language srcLanguage = languageRepository.findByLanguageCode(languageCode);
+        final Language srcLanguage = languageRepository.findOneByLanguageCode(languageCode);
         return repository.findAllByLanguageSrc(srcLanguage);
     }
 
@@ -35,8 +35,8 @@ public class LanguageNameService {
     }
 
     public void add(final LanguageName language) {
-        final Language src = languageRepository.findByLanguageCode(language.getLanguageSrc().getLanguageCode());
-        final Language dst = languageRepository.findByLanguageCode(language.getLanguageDst().getLanguageCode());
+        final Language src = languageRepository.findOneByLanguageCode(language.getLanguageSrc().getLanguageCode());
+        final Language dst = languageRepository.findOneByLanguageCode(language.getLanguageDst().getLanguageCode());
         language.setLanguageSrc(src);
         language.setLanguageDst(dst);
         repository.save(language);

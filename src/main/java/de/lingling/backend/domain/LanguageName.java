@@ -18,7 +18,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
+@Table(name = "LANGUAGE_NAME")
 @Entity
 public class LanguageName implements Serializable {
 

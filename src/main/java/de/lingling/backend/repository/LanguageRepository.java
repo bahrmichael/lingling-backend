@@ -13,5 +13,5 @@ import org.springframework.data.repository.CrudRepository;
 import de.lingling.backend.domain.Language;
 
 public interface LanguageRepository extends CrudRepository<Language, Long> {
-    Language findByLanguageCode(String languageCode);
+    Language findOneByLanguageCode(String languageCode);
 }

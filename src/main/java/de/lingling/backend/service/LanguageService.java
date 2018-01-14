@@ -21,6 +21,6 @@ public class LanguageService {
     }
 
     public Language find(final String languageCode) {
-        return repository.findByLanguageCode(languageCode);
+        return repository.findOneByLanguageCode(languageCode);
     }
 }

@@ -13,5 +13,5 @@ import org.springframework.data.repository.CrudRepository;
 import de.lingling.backend.domain.Account;
 
 public interface AccountRepository extends CrudRepository<Account, Long> {
-    Account findByAlexaId(String alexaId);
+    Account findOneByAlexaId(String alexaId);
 }

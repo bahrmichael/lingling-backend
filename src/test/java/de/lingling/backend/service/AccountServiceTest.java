@@ -25,14 +25,14 @@ public class AccountServiceTest {
     @Test
     public void createAccount() {
         final Language language = new Language();
-        when(langRepo.findByLanguageCode(LANG_CODE)).thenReturn(language);
+        when(langRepo.findOneByLanguageCode(LANG_CODE)).thenReturn(language);
 
         final ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         when(accountRepo.save(captor.capture())).thenReturn(null);
 
         sut.createAccount(ALEXA_ID, LANG_CODE);
 
-        verify(langRepo).findByLanguageCode(LANG_CODE);
+        verify(langRepo).findOneByLanguageCode(LANG_CODE);
         verify(accountRepo).save(any(Account.class));
         assertEquals(ALEXA_ID, captor.getValue().getAlexaId());
         assertEquals(language, captor.getValue().getLanguageSrc());
@@ -42,7 +42,7 @@ public class AccountServiceTest {
     @Test
     public void findAccount() {
         final Account account = new Account();
-        when(accountRepo.findByAlexaId(ALEXA_ID)).thenReturn(account);
+        when(accountRepo.findOneByAlexaId(ALEXA_ID)).thenReturn(account);
 
         final Account result = sut.findAccount(ALEXA_ID);
 

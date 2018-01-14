@@ -32,7 +32,11 @@ public class AuditService {
 
     public String findLatestSentence(final String alexaId) {
         final Optional<Audit> optional = repository.findFirstByAlexaIdAndActionOrderByTimestampDesc(alexaId, Action.SENTENCE);
-        return optional.orElseThrow(this::noSentence).getReturnedValue();
+        if (optional.isPresent()) {
+            return optional.get().getReturnedValue();
+        } else {
+            return null;
+        }
     }
 
     private IllegalStateException noSentence() {

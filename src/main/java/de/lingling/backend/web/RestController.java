@@ -64,11 +64,11 @@ public class RestController {
     }
 
     @PostMapping(value = "/init")
-    public ResponseEntity signUp(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
-                                 @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance,
-                                 @RequestHeader(name = Headers.ALEXA_LANGUAGE, required = true) final String language) {
+    public ResponseEntity init(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
+                               @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance,
+                               @RequestHeader(name = Headers.ALEXA_LANGUAGE, required = true) final String language) {
         final Account account = accountService.findAccount(alexaId);
-        if (null != account) {
+        if (null == account) {
             accountService.createAccount(alexaId, language);
             return ResponseEntity.status(201).build();
         } else {

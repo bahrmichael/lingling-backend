@@ -2,6 +2,7 @@ package de.lingling.backend.web;
 
 import java.util.Collections;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,11 +43,15 @@ public class FreqWordController {
     @GetMapping
     @ResponseBody
     @Transactional
-    public String getFrequencyWord(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
+    public ResponseEntity<String> getFrequencyWord(@RequestHeader(name = Headers.ALEXA_ID, required = true) final String alexaId,
             @RequestHeader(name = Headers.UTTERANCE, required = false) final String utterance) {
-        final String returnedWord = wordService.getNextFrequencyWord(alexaId).getText();
+        final Word nextFrequencyWord = wordService.getNextFrequencyWord(alexaId);
+        if (null == nextFrequencyWord) {
+            return ResponseEntity.noContent().build();
+        }
+        final String returnedWord = nextFrequencyWord.getText();
         auditService.addAudit(alexaId, utterance, Action.FREQUENCY_WORD, returnedWord);
-        return returnedWord;
+        return ResponseEntity.ok(returnedWord);
     }
 
     @PostMapping("/ok")

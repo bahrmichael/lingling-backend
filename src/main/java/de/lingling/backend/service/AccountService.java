@@ -8,16 +8,14 @@
 
 package de.lingling.backend.service;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Component;
 
 import de.lingling.backend.domain.Account;
+import de.lingling.backend.domain.Language;
 import de.lingling.backend.repository.AccountRepository;
 import de.lingling.backend.repository.LanguageRepository;
 
 @Component
-@Transactional
 public class AccountService {
 
     private final AccountRepository repository;
@@ -29,15 +27,16 @@ public class AccountService {
         this.languageRepository = languageRepository;
     }
 
-    public Account createAccount(final String alexaId, final String languageIsoCode) {
+    public void createAccount(final String alexaId, final String languageIsoCode) {
+        final Language language = languageRepository.findOneByLanguageCode(languageIsoCode);
+
         final Account account = new Account();
         account.setAlexaId(alexaId);
-        account.setLanguageSrc(languageRepository.findByLanguageCode(languageIsoCode));
+        account.setLanguageSrc(language);
         repository.save(account);
-        return account;
     }
 
     public Account findAccount(final String alexaId) {
-        return repository.findByAlexaId(alexaId);
+        return repository.findOneByAlexaId(alexaId);
     }
 }

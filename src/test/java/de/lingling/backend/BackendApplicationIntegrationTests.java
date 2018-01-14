@@ -1,102 +1,78 @@
 package de.lingling.backend;
 
-import java.io.IOException;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
-import org.json.JSONArray;
-import org.junit.Ignore;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnection.H2;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import de.lingling.backend.domain.Language;
-import de.lingling.backend.domain.LanguageName;
-import de.lingling.backend.domain.Word;
 import de.lingling.backend.web.Headers;
 
-@Ignore
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = BackendApplication.class)
+@AutoConfigureMockMvc
+@AutoConfigureTestDatabase(connection = H2)
+@TestPropertySource(locations = "classpath:config/application-dev.properties")
 public class BackendApplicationIntegrationTests {
 
-//    public static final String BASE_URL = "http://localhost:8080";
-    public static final String BASE_URL = "http://52.213.36.32:8080";
+    public static final String BASE_URL = "";
+//    public static final String BASE_URL = "http://52.213.36.32:8080";
+
+
+    @Autowired
+    private MockMvc mvc;
 
     @Test
-    public void prep() throws Exception {
-        // PREP
-        final Language language = new Language();
-        language.setLanguageCode("en");
-        HttpResponse<JsonNode> postLanguage1 = Unirest.post(BASE_URL + "/languages")
-                                                      .header("Content-Type","application/json")
-                                                      .body(TestUtil.convertObjectToJsonBytes(language))
-                                                      .asJson();
-        assertEquals(200, postLanguage1.getStatus());
+    public void homeRun() throws Exception {
+        final String alexaId = "integrationtest-" + System.currentTimeMillis();
 
-        final Language language2 = new Language();
-        language2.setLanguageCode("de");
-        HttpResponse<JsonNode> postLanguage2 = Unirest.post(BASE_URL + "/languages")
-                                                      .header("Content-Type","application/json")
-                                                      .body(TestUtil.convertObjectToJsonBytes(language2))
-                                                      .asJson();
-        assertEquals(200, postLanguage2.getStatus());
+        mvc.perform(post("/init").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en"))
+                .andExpect(status().isCreated());
 
-        final LanguageName languageName = new LanguageName();
-        languageName.setLanguageSrc(language);
-        languageName.setLanguageDst(language2);
-        languageName.setName("German");
-        HttpResponse<JsonNode> postLanguageName = Unirest.post(BASE_URL + "/language-names")
-                                                         .header("Content-Type", "application/json")
-                                                         .body(TestUtil.convertObjectToJsonBytes(languageName))
-                                                         .asJson();
-        assertEquals(200, postLanguageName.getStatus());
-    }
+        mvc.perform(get("/languages").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0]", is("German")));
 
-    @Test
-    public void addFrequencyWords() throws Exception {
-        addWord(10L, "Baum");
-        addWord(20L, "Kaffee");
-        addWord(30L, "Vogel");
-        addWord(40L, "Butter");
-        addWord(50L, "Haus");
-    }
+        mvc.perform(put("/learner/German").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en"))
+                .andExpect(status().isOk());
 
-    private void addWord(final long frequency, final String text) throws UnirestException, IOException {
-        final Word word = new Word();
-        word.setFrequency(frequency);
-        word.setText(text);
-        HttpResponse<JsonNode> response = Unirest.post(BASE_URL + "/frequency-words/de")
-                .header("Content-Type", "application/json")
-                .body(TestUtil.convertObjectToJsonBytes(word))
-                .asJson();
-        assertEquals(200, response.getStatus());
-    }
+        mvc.perform(get("/onboarding-completed").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en"))
+                .andExpect(status().isNoContent());
 
-    @Test
-    public void test() throws Exception {
-        // RUN
-        String alexaId = "alexa-" + System.currentTimeMillis();
+        // FREQUENCY WORDS
 
-        HttpResponse<String> signup = Unirest.post(BASE_URL + "/signup").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en-US").asString();
-        assertEquals(200, signup.getStatus());
+        mvc.perform(get("/frequency-words").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .andExpect(jsonPath("$", is("Haus")));
 
-        HttpResponse<String> response = Unirest.get(BASE_URL + "/latest-interaction").header(Headers.ALEXA_ID, alexaId).asString();
-        assertEquals(404, response.getStatus());
+        mvc.perform(get("/frequency-words").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .andExpect(jsonPath("$", is("Haus")));
 
-        HttpResponse<String> response2 = Unirest.get(BASE_URL + "/latest-interaction").header(Headers.ALEXA_ID, alexaId).asString();
-        assertEquals(200, response2.getStatus());
+        mvc.perform(post("/frequency-words/ok").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en"))
+                .andExpect(status().isOk());
 
-        HttpResponse<JsonNode> response3 = Unirest.get(BASE_URL + "/languages").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en-US").asJson();
-        assertEquals(200, response3.getStatus());
-        JSONArray languagesArray = response3.getBody().getArray();
-        assertEquals(1, languagesArray.length());
-        String possibleDstLanguage = languagesArray.getString(0);
-        assertEquals("German", possibleDstLanguage);
-
-        HttpResponse<JsonNode> response4 = Unirest.put(BASE_URL + "/learner/" + possibleDstLanguage).header(Headers.ALEXA_ID, alexaId).asJson();
-        assertEquals(200, response4.getStatus());
-
+        mvc.perform(get("/frequency-words").header(Headers.ALEXA_ID, alexaId).header(Headers.ALEXA_LANGUAGE, "en"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .andExpect(jsonPath("$", is("Butter")));
 
     }
 

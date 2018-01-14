@@ -1,0 +1,347 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 1
+      author: mba
+      changes:
+        - createTable:
+            tableName: LANGUAGE
+            columns:
+              - column:
+                  name: id
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: LANGUAGE_CODE
+                  type: varchar(3 char)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 1.1
+      author: mba
+      changes:
+      - addUniqueConstraint:
+          columnNames: LANGUAGE_CODE
+          constraintName: languageCodeUnique
+          tableName: LANGUAGE
+
+  - changeSet:
+      id: 1.2
+      author: mba
+      changes:
+      - sql:
+          sql: insert into LANGUAGE (LANGUAGE_CODE) values ('en');
+      - sql:
+          sql: insert into LANGUAGE (LANGUAGE_CODE) values ('de');
+
+  - changeSet:
+      id: 1.3
+      author: mba
+      changes:
+        - createTable:
+            tableName: ACCOUNT
+            columns:
+              - column:
+                  name: id
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ALEXA_ID
+                  type: varchar(255 char)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: LANGUAGE_SRC_ID
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 1.4
+      author: mba
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: LANGUAGE_SRC_ID
+          baseTableName: ACCOUNT
+          constraintName: fk_account_language
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: LANGUAGE
+
+  - changeSet:
+      id: 2
+      author: mba
+      changes:
+        - createTable:
+            tableName: LANGUAGE_NAME
+            columns:
+              - column:
+                  name: id
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: LANGUAGE_SRC_ID
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: LANGUAGE_DST_ID
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: NAME
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 3
+      author: mba
+      changes:
+      - addUniqueConstraint:
+          columnNames: LANGUAGE_SRC_ID, LANGUAGE_DST_ID
+          constraintName: languageNameUnique
+          tableName: LANGUAGE_NAME
+      - addForeignKeyConstraint:
+          baseColumnNames: LANGUAGE_SRC_ID
+          baseTableName: LANGUAGE_NAME
+          constraintName: fk_language_src
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: LANGUAGE
+      - addForeignKeyConstraint:
+          baseColumnNames: LANGUAGE_DST_ID
+          baseTableName: LANGUAGE_NAME
+          constraintName: fk_language_dst
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: LANGUAGE
+
+  - changeSet:
+      id: 4
+      author: mba
+      changes:
+      - sql:
+          endDelimiter: \nCOMMIT
+          sql: insert into LANGUAGE_NAME (LANGUAGE_SRC_ID, LANGUAGE_DST_ID, name) values ((select id from LANGUAGE where LANGUAGE_CODE = 'en'), (select id from LANGUAGE where LANGUAGE_CODE = 'de'), 'German')
+
+  - changeSet:
+      id: 5
+      author: mba
+      changes:
+        - createTable:
+            tableName: WORD
+            columns:
+              - column:
+                  name: id
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: LANGUAGE_ID
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: varchar(255 char)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: frequency
+                  type: long
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 5.1
+      author: mba
+      changes:
+      - addUniqueConstraint:
+          columnNames: LANGUAGE_ID, text
+          constraintName: wordUnique
+          tableName: WORD
+      - addForeignKeyConstraint:
+          baseColumnNames: LANGUAGE_ID
+          baseTableName: WORD
+          constraintName: fk_word_language
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: LANGUAGE
+
+  - changeSet:
+      id: 5.2
+      author: mba
+      changes:
+      - sql:
+          endDelimiter: \nCOMMIT
+          sql: insert into WORD (LANGUAGE_ID, frequency, text) values ((select id from LANGUAGE where LANGUAGE_CODE = 'de'), 10, 'Baum')
+      - sql:
+          endDelimiter: \nCOMMIT
+          sql: insert into WORD (LANGUAGE_ID, frequency, text) values ((select id from LANGUAGE where LANGUAGE_CODE = 'de'), 20, 'Kaffee')
+      - sql:
+          endDelimiter: \nCOMMIT
+          sql: insert into WORD (LANGUAGE_ID, frequency, text) values ((select id from LANGUAGE where LANGUAGE_CODE = 'de'), 30, 'Vogel')
+      - sql:
+          endDelimiter: \nCOMMIT
+          sql: insert into WORD (LANGUAGE_ID, frequency, text) values ((select id from LANGUAGE where LANGUAGE_CODE = 'de'), 40, 'Butter')
+      - sql:
+          endDelimiter: \nCOMMIT
+          sql: insert into WORD (LANGUAGE_ID, frequency, text) values ((select id from LANGUAGE where LANGUAGE_CODE = 'de'), 50, 'Haus')
+
+  - changeSet:
+      id: 6
+      author: mba
+      changes:
+        - createTable:
+            tableName: AUDIT
+            columns:
+              - column:
+                  name: id
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ALEXA_ID
+                  type: varchar(255 char)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ACTION
+                  type: varchar(255 char)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: RETURNED_SENTENCE
+                  type: varchar(255 char)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: UTTERANCE
+                  type: varchar(255 char)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: TIMESTAMP
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 7
+      author: mba
+      changes:
+        - createTable:
+            tableName: LEARNER
+            columns:
+              - column:
+                  name: id
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ACCOUNT_ID
+                  type: long
+                  constraints:
+                    nullable: false
+              - column:
+                  name: LANGUAGE_DST_ID
+                  type: long
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 7.1
+      author: mba
+      changes:
+      - addUniqueConstraint:
+          columnNames: ACCOUNT_ID, LANGUAGE_DST_ID
+          constraintName: learnerUnique
+          tableName: LEARNER
+      - addForeignKeyConstraint:
+          baseColumnNames: ACCOUNT_ID
+          baseTableName: LEARNER
+          constraintName: fk_learner_account
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: ACCOUNT
+      - addForeignKeyConstraint:
+          baseColumnNames: LANGUAGE_DST_ID
+          baseTableName: LEARNER
+          constraintName: fk_learner_language
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: LANGUAGE
+
+  - changeSet:
+      id: 8
+      author: mba
+      changes:
+        - createTable:
+            tableName: KNOWN_WORD
+            columns:
+              - column:
+                  name: id
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: WORD_ID
+                  type: long
+                  constraints:
+                    nullable: false
+              - column:
+                  name: LEARNER_ID
+                  type: long
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 8.1
+      author: mba
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: WORD_ID
+          baseTableName: KNOWN_WORD
+          constraintName: fk_knownword_word
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: WORD
+      - addForeignKeyConstraint:
+          baseColumnNames: LEARNER_ID
+          baseTableName: KNOWN_WORD
+          constraintName: fk_knownword_learner
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: LEARNER

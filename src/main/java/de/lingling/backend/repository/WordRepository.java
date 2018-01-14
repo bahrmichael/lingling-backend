@@ -23,4 +23,6 @@ public interface WordRepository extends CrudRepository<Word, Long> {
     Word findWord(String text, Language language);
 
     Stream<Word> findTop10ByIdNotInOrderByFrequencyDesc(List<Long> ids);
+
+    Stream<Word> findAllByOrderByFrequencyDesc();
 }
